@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using HackFramework;
 
 namespace Sven_Coop_Position {
     public partial class ViewPort : Form {
@@ -41,8 +42,11 @@ namespace Sven_Coop_Position {
                 }
             }
         }
-        
+
+        const int SPEED = 10;
+
         private void ViewPort_KeyDown(object sender, KeyEventArgs e) {
+            // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
             switch (e.KeyData) {
                 case Keys.S: {
                     var st = new Thread( () => {
@@ -79,7 +83,28 @@ namespace Sven_Coop_Position {
 
                     break;
                 }
+                case Keys.Right:
+                    Program.LastPos = Program.LastPos.Add( 1 * SPEED, 0, 0 );
+                    Program.M.WriteMemory<Vec3>( Program.posPtr, Program.LastPos );
+
+                    break;
+                case Keys.Left:
+                    Program.LastPos = Program.LastPos.Add( -1 * SPEED, 0, 0 );
+                    Program.M.WriteMemory<Vec3>( Program.posPtr, Program.LastPos );
+
+                    break;
+                case Keys.Down:
+                    Program.LastPos = Program.LastPos.Add( 0, 1 * SPEED, 0 );
+                    Program.M.WriteMemory<Vec3>( Program.posPtr, Program.LastPos );
+
+                    break;
+                case Keys.Up:
+                    Program.LastPos = Program.LastPos.Add( 0, -1 * SPEED, 0 );
+                    Program.M.WriteMemory<Vec3>( Program.posPtr, Program.LastPos );
+
+                    break;
             }
+
         }
     }
     public sealed class PanelDoubleBuffer : Panel {

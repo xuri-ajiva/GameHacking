@@ -12,11 +12,11 @@ namespace Sven_Coop_Position {
     class Program {
         private const int    SIZE           = 1000;
         private const int    FACTOR         = 50;
-        private const int    PS             = 20;
+        private const int    PS             = 5;
         private const double MAGIC_DISTANCE = SIZE / FACTOR * PS;
         public static Color  ClearColor => Color.FromArgb( 255, 43, 43, 43 );
 
-        private static  Memory   M;
+        public static  Memory   M;
         private static  IntPtr   BasePtr;
         static readonly IntPtr[] Offsets = { (IntPtr) 0x570EE00, (IntPtr) 0x88 };
         private const   string   PROCESS = "svencoop";
@@ -37,15 +37,16 @@ namespace Sven_Coop_Position {
                     var p1 = CalcPos( updatePo.Item1 );
                     var p2 = CalcPos( updatePo.Item2 );
                     var h  = ( (int) updatePo.Item2.Z + 111111 );
-                    
+
                     int cr = (int) ( ( ( h >> 1 ) / 1 ) % 255 );
                     int cg = (int) ( ( ( h >> 3 ) / 1 ) % 255 );
                     int cb = (int) ( ( ( h >> 5 ) / 1 ) % 255 );
                     //Console.WriteLine( $"Pos: {x}, {y}" );
 
-                    lock (vp.LockObj) {
-                        g.FillRectangle( Brushes.White,                                       p2.X, p2.Y, PS, PS );
-                        g.FillRectangle( new SolidBrush( Color.FromArgb( 255, cr, cg, cb ) ), p1.X, p1.Y, PS, PS );
+                    lock (vp.LockObj) { 
+                        g.FillRectangle( new SolidBrush( ClearColor ), p1.X, p1.Y, PS, PS );
+                        g.FillRectangle( Brushes.White,                p2.X, p2.Y, PS, PS );
+                        g.DrawLine(new Pen( Color.FromArgb( 255, cr, cg, cb ) ){ Width= PS} , p1.X, p1.Y, p2.X, p2.Y );
                     }
 
                     try {
@@ -65,19 +66,21 @@ namespace Sven_Coop_Position {
                 Main( args );
             } ).Start();
             new Thread( () => {
-                const int sleep  = 5;
-                const int radius = 2500;
+                const int sleep  = 2;
+                const int radius = 200;
                 Thread.Sleep( 2000 );
                 var    sp   = LastPos;
                 double time = 0;
 
                 while ( true ) {
-                    var cp = sp.Add( new Vec3( Math.Sin( time * ( Math.E - 2.6 )) * radius, Math.Cos( time * ( Math.PI - 3 )  ) * radius, -Math.Sin( time * ( Math.E+Math.PI - 5.7 ) ) * radius ) );
+                    var cp = sp.Add( new Vec3( Math.Sin( time * ( Math.E - 2.6 ) ) * radius, Math.Cos( time * ( Math.PI - 3 ) ) * radius, -Math.Sin( time * ( Math.E + Math.PI - 5.7 ) ) * radius ) );
                     M.WriteMemory<Vec3>( posPtr, cp );
                     Thread.Sleep( sleep );
                     time += sleep / 500d;
                 }
-            } ).Start();
+            } );//.Start();
+
+
             Application.Run( vp );
         }
 
@@ -98,7 +101,7 @@ namespace Sven_Coop_Position {
         }
 
         public static  Vec3   LastPos = Vec3.Zero;
-        private static IntPtr posPtr  = IntPtr.Zero;
+        public static IntPtr posPtr  = IntPtr.Zero;
 
         static IEnumerable<(Vec3, Vec3)> UpdatePos(Memory m) {
             while ( posPtr == IntPtr.Zero ) {
