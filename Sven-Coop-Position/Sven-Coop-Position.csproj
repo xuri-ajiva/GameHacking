@@ -48,6 +48,12 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewPort.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ViewPort.Designer.cs">
+      <DependentUpon>ViewPort.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -57,6 +63,11 @@
       <Project>{3e6f21c2-0b51-4719-a1ec-e9eac50b5a62}</Project>
       <Name>Framework</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ViewPort.resx">
+      <DependentUpon>ViewPort.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
