@@ -47,11 +47,11 @@ namespace HackFramework {
             for ( var i = 0; i < trys; i++ ) {
                 Thread.Sleep( 500 );
                 Console.SetCursorPosition( cl, Console.CursorTop );
-                Console.Write( new string( '.', i % 8 )  + new string( ' ', 8 ));
+                Console.Write( new string( '.', i % 8 ) + new string( ' ', 8 ) );
 
                 if ( Attatch( processName, ref this.MiProcess, ref this.MiProcessHandle ) ) break;
             }
-            
+
             Thread.Sleep( 500 );
             Console.WriteLine( " Found!" );
         }
@@ -233,5 +233,57 @@ namespace HackFramework {
 
         #endregion
 
+    }
+
+    public class DirectUpdate <T> where T : struct {
+        private          IntPtr   upDatePtr;
+        private          Memory   M;
+        private          IntPtr   BasePtr;
+        private readonly IntPtr[] Offsets;
+        private readonly string   moduleBaseName;
+
+        public DirectUpdate(Memory m, IntPtr[] offsets, string moduleBaseName) {
+            this.M              = m;
+            this.Offsets        = offsets;
+            this.moduleBaseName = moduleBaseName;
+            RecalculatePtr();
+        }
+
+
+        public void RecalculatePtr() {
+            Console.WriteLine( "MiProcessHandle: " + this.M.MiProcessHandle );
+            this.BasePtr = this.M.GetModuleAddress( this.moduleBaseName );
+            Console.WriteLine( "BasePtr: " + this.BasePtr );
+            this.upDatePtr = this.M.GetMultiLevelPointer( this.BasePtr, this.Offsets, false );
+            Console.WriteLine( "posPtr: " + this.BasePtr );
+        }
+
+        public IntPtr UpDatePtr {
+            [DebuggerStepThrough] get => this.upDatePtr;
+        }
+
+        public Memory M1 {
+            [DebuggerStepThrough] get => this.M;
+        }
+
+        public IntPtr BasePtr1 {
+            [DebuggerStepThrough] get => this.BasePtr;
+        }
+
+        public IntPtr[] Offsets1 {
+            [DebuggerStepThrough] get => this.Offsets;
+        }
+
+        public string ModuleBaseName {
+            [DebuggerStepThrough] get => this.moduleBaseName;
+        }
+
+        public void SetValue(T value) { this.M.WriteMemory<T>( this.upDatePtr, value ); }
+        public T    GetValue()        { return this.M.ReadMemory<T>( this.upDatePtr ); }
+
+        public T Value {
+            [DebuggerStepThrough] get => GetValue();
+            [DebuggerStepThrough] set => SetValue( value );
+        }
     }
 }
