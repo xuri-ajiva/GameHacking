@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sven-Coop-Position", "Sven-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppTests", "CppTests\CppTests.vcxproj", "{A85A886C-5317-4357-B30B-3EAD9343B3A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sven-Coop-Map", "Sven-Coop-Map\Sven-Coop-Map.csproj", "{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,18 @@ Global
 		{A85A886C-5317-4357-B30B-3EAD9343B3A3}.Release|x64.Build.0 = Release|x64
 		{A85A886C-5317-4357-B30B-3EAD9343B3A3}.Release|x86.ActiveCfg = Release|Win32
 		{A85A886C-5317-4357-B30B-3EAD9343B3A3}.Release|x86.Build.0 = Release|Win32
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Debug|x64.Build.0 = Debug|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Debug|x86.Build.0 = Debug|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Release|x64.ActiveCfg = Release|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Release|x64.Build.0 = Release|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Release|x86.ActiveCfg = Release|Any CPU
+		{254BD657-C72F-44DD-AFB3-EEDAC76C5DC8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
