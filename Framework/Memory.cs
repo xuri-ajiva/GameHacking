@@ -1,185 +1,175 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#region using
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security;
 
-namespace Framework {
-    public class ImportsY {
-        private static readonly int PROCESS_WM_READ = 0x0010;
+#endregion
 
-
-        const  string  procName = "hl";
-        static Process process  = null;
-        static IntPtr  processHandle;
-
-        public static byte[] Read(int handle, int address, int size, ref int bytes) {
-            byte[] buffer = new byte[size];
-            Imports.ReadProcessMemory( handle, address, buffer, size, ref bytes );
-            return buffer;
-        }
-
-        static void Main(string[] args) {
-            int    bytesRead = 0;
-            byte[] value     = new byte[20];
-            int    address   = 0x019EF0D7;
-
-            Console.WriteLine( "Starting" );
-            process       = Process.GetProcessesByName( procName )[0];
-            processHandle = Imports.OpenProcess( PROCESS_WM_READ, false, process.Id );
-
-            while ( true ) {
-                //ReadProcessMemory((int)processHandle, jumpAddresses, jumpValues, jumpValues.Length, ref bytesRead);
-                value = Read( (int) processHandle, address, 20, ref bytesRead );
-                Console.WriteLine( int.Parse( bytesRead.ToString() ) + " " + bytesRead );
-                Thread.Sleep( 100 );
-            }
-        }
-
-    }
-
-
+namespace HackFramework {
     /// <summary>
-    /// https://github.com/alessiocentorrino/hihutex-memory-class/blob/master/Memory.cs
+    ///     https://github.com/alessiocentorrino/hihutex-memory-class/blob/master/Memory.cs
     /// </summary>
-    [SuppressUnmanagedCodeSecurity]
-    public class Imports {
-
-        [DllImport( "kernel32.dll" )]
-        public static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
-
-        [DllImport( "kernel32.dll" )]
-        public static extern bool ReadProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesRead);
-
-
-        [DllImport( "ntdll" )] public static extern bool NtReadVirtualMemory(IntPtr  ProcessHandle, IntPtr BaseAddress, byte[] Buffer, int NumberOfBytesToRead,  out int NumberOfBytesRead);
-        [DllImport( "ntdll" )] public static extern bool NtWriteVirtualMemory(IntPtr ProcessHandle, IntPtr BaseAddress, byte[] Buffer, int NumberOfBytesToWrite, out int NumberOfBytesWritten);
-
-        private readonly IntPtr processHandle;
-
-        public Imports(IntPtr processHandle)
-            => this.processHandle = processHandle;
-
-        /*
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public unsafe T Read <T>(IntPtr address) where T : struct {
-            byte[] buffer = new byte[Unsafe.SizeOf<T>()];
-
-            NtReadVirtualMemory( processHandle, address, buffer, buffer.Length, 0 );
-
-            fixed (byte* b = buffer)
-                return Unsafe.Read<T>( b );
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public unsafe bool Write <T>(IntPtr address, T value) where T : struct {
-            byte[] buffer = new byte[Unsafe.SizeOf<T>()];
-
-            fixed (byte* b = buffer)
-                Unsafe.Write<T>( b, value );
-
-            return NtWriteVirtualMemory( processHandle, address, buffer, buffer.Length, 0 );
-        }   */
-
-    }
     /// <summary>
-    /// <exception>
-    /// <![CDATA[
-    /// var Found = false;
     /// 
-    /// while (!Found) {
-    ///     Thread.Sleep(250);
-    ///     Found = Memory.Attatch("Processname");
-    /// }
-    /// int MyDll = Memory.GetModuleAddress("MyDll.dll");
-    /// Memory.WriteMemory<type>(offset, value);
-    /// var Value = Memory.ReadMemory<type>(offset);
-    /// ]]></exception>
+    ///     <example>
+    ///         <![CDATA[
+    /// string   process = "svencoop";                            
+    /// IntPtr[] offsets = { (IntPtr) 0x570EE00, (IntPtr) 0x88 }; 
+    /// Memory   m       = new Memory();                          
+    /// m.AttatchLoop( process );                                 
+    /// var basePtr = m.GetModuleAddress( "hw.dll" );             
+    /// var posPtr = m.GetMultiLevelPointer( basePtr, offsets, false );       
+    /// while ( true ) {                                          
+    ///     Thread.Sleep( 300 );                                  
+    ///     var pos = m.ReadMemory<Vec3>( posPtr );               
+    ///     Console.WriteLine( pos );                             
+    /// }                                                         
+    /// ]]></example>
     /// </summary>
     public class Memory {
-        private static Process m_iProcess;
-        private static IntPtr  m_iProcessHandle;
 
-        private static int m_iBytesWritten;
-        private static int m_iBytesRead;
 
-        public static bool Attatch(string ProcName) {
-            if ( Process.GetProcessesByName( ProcName ).Length > 0 ) {
-                m_iProcess = Process.GetProcessesByName( ProcName )[0];
-                m_iProcessHandle =
-                    Imports.OpenProcess( Flags.PROCESS_VM_OPERATION | Flags.PROCESS_VM_READ | Flags.PROCESS_VM_WRITE,
-                        false, m_iProcess.Id );
+        private static int     mIBytesWritten;
+        private static int     mIBytesRead;
+        public         Process MiProcess;
+        public         IntPtr  MiProcessHandle;
+
+
+        public void AttachLoop(string processName, int trys = 100) {
+            var found = false;
+            Console.Write( "Waiting for " + processName + "" );
+            int cl = Console.CursorLeft;
+
+            for ( var i = 0; i < trys; i++ ) {
+                Thread.Sleep( 500 );
+                Console.SetCursorPosition( cl, Console.CursorTop );
+                Console.Write( new string( '.', i % 8 )  + new string( ' ', 8 ));
+
+                if ( Attatch( processName, ref this.MiProcess, ref this.MiProcessHandle ) ) break;
+            }
+            
+            Thread.Sleep( 500 );
+            Console.WriteLine( " Found!" );
+        }
+
+
+        #region DynamicInvokers
+
+        public void WriteMemory <T>(IntPtr address, object value) => WriteMemory<T>( address, value, ref this.MiProcessHandle );
+
+        public void WriteMemory <T>(IntPtr address, char[] value) => WriteMemory<T>( address, value, ref this.MiProcessHandle );
+
+        public T ReadMemory <T>(IntPtr address) where T : struct => ReadMemory<T>( address, ref this.MiProcessHandle );
+
+        public byte[] ReadMemory(IntPtr offset, int size) => ReadMemory( offset, size, ref this.MiProcessHandle );
+
+        public float[] ReadMatrix <T>(IntPtr address, int matrixSize) where T : struct => ReadMatrix<T>( address, matrixSize, ref this.MiProcessHandle );
+
+        public IntPtr GetModuleAddress(string name) => GetModuleAddress( name, ref this.MiProcess );
+
+        public IntPtr GetMultiLevelPointer(IntPtr @base, IntPtr[] offsets, bool debug = default) => GetMultiLevelPointer( ref this.MiProcess, @base, offsets, ref this.MiProcessHandle, debug );
+
+        #endregion
+
+        #region Static
+
+        public static bool Attatch(string procName, ref Process mIProcess, ref IntPtr mIProcessHandle) {
+            if ( Process.GetProcessesByName( procName ).Length > 0 ) {
+                mIProcess = Process.GetProcessesByName( procName )[0];
+                mIProcessHandle = OpenProcess( ProcessFlags.PROCESS_VM_OPERATION | ProcessFlags.PROCESS_VM_READ | ProcessFlags.PROCESS_VM_WRITE,
+                    false, mIProcess.Id );
                 return true;
             }
 
             return false;
         }
 
-        public static void WriteMemory <T>(IntPtr Address, object Value) {
-            var buffer = StructureToByteArray( Value );
+        public static void WriteMemory <T>(IntPtr address, object value, ref IntPtr miProcessHandle) {
+            var buffer = StructureToByteArray( value );
 
-            Imports.NtWriteVirtualMemory( m_iProcessHandle, Address, buffer, buffer.Length, out m_iBytesWritten );
+            NtWriteVirtualMemory( miProcessHandle, address, buffer, buffer.Length, out mIBytesWritten );
         }
 
-        public static void WriteMemory <T>(IntPtr Adress, char[] Value) {
-            var buffer = Encoding.UTF8.GetBytes( Value );
+        public static void WriteMemory <T>(IntPtr address, char[] value, ref IntPtr miProcessHandle) {
+            var buffer = Encoding.UTF8.GetBytes( value );
 
-            Imports.NtWriteVirtualMemory( m_iProcessHandle, Adress, buffer, buffer.Length, out m_iBytesWritten );
+            NtWriteVirtualMemory( miProcessHandle, address, buffer, buffer.Length, out mIBytesWritten );
         }
 
-        public static T ReadMemory <T>(IntPtr address) where T : struct {
-            var ByteSize = Marshal.SizeOf<T>();
+        public static T ReadMemory <T>(IntPtr address, ref IntPtr miProcessHandle) where T : struct {
+            int byteSize = Marshal.SizeOf<T>();
 
-            var buffer = new byte[ByteSize];
+            var buffer = new byte[byteSize];
 
-            Imports.NtReadVirtualMemory( m_iProcessHandle, address, buffer, buffer.Length, out m_iBytesRead );
+            NtReadVirtualMemory( miProcessHandle, address, buffer, buffer.Length, out mIBytesRead );
 
-            return ByteArrayToStructure<T>( buffer.Take( m_iBytesRead ).ToArray() );
+            return ByteArrayToStructure<T>( buffer.Take( mIBytesRead ).ToArray() );
         }
 
-        public static byte[] ReadMemory(IntPtr offset, int size) {
+        public static byte[] ReadMemory(IntPtr offset, int size, ref IntPtr miProcessHandle) {
             var buffer = new byte[size];
 
-            Imports.NtReadVirtualMemory( m_iProcessHandle, offset, buffer, size, out m_iBytesRead );
+            NtReadVirtualMemory( miProcessHandle, offset, buffer, size, out mIBytesRead );
 
-            return buffer.Take( m_iBytesRead ).ToArray();
+            return buffer.Take( mIBytesRead ).ToArray();
         }
 
-        public static float[] ReadMatrix <T>(IntPtr Adress, int MatrixSize) where T : struct {
-            var ByteSize = Marshal.SizeOf( typeof(T) );
-            var buffer   = new byte[ByteSize * MatrixSize];
-            Imports.NtReadVirtualMemory( m_iProcessHandle, Adress, buffer, buffer.Length, out m_iBytesRead );
+        public static long ReadInt64(IntPtr address, ref IntPtr miProcessHandle, int length = 8, IntPtr? handle = null) => BitConverter.ToInt32( ReadMemory( address, length, ref miProcessHandle ), 0 );
 
-            return ConvertToFloatArray( buffer.Take( m_iBytesRead ).ToArray() );
+        public static float[] ReadMatrix <T>(IntPtr address, int matrixSize, ref IntPtr miProcessHandle) where T : struct {
+            int byteSize = Marshal.SizeOf( typeof(T) );
+            var buffer   = new byte[byteSize * matrixSize];
+            NtReadVirtualMemory( miProcessHandle, address, buffer, buffer.Length, out mIBytesRead );
+
+            return ConvertToFloatArray( buffer.Take( mIBytesRead ).ToArray() );
         }
 
-        public static int GetModuleAddress(string Name) {
+        public static IntPtr GetModuleAddress(string name, ref Process miProcess) {
             try {
-                foreach ( ProcessModule ProcMod in m_iProcess.Modules )
-                    if ( Name == ProcMod.ModuleName )
-                        return (int) ProcMod.BaseAddress;
+                foreach ( ProcessModule procMod in miProcess.Modules )
+                    if ( name == procMod.ModuleName )
+                        return procMod.BaseAddress;
             } catch { }
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine( "ERROR: Cannot find - " + Name + " | Check file extension." );
+            Console.WriteLine( "ERROR: Cannot find - " + name + " | Check file extension." );
             Console.ResetColor();
 
-            return -1;
+            return IntPtr.Zero;
         }
 
-        #region Other
+        public static IntPtr GetMultiLevelPointer(ref Process handle, IntPtr @base, IntPtr[] offsets, ref IntPtr miProcessHandle, bool debug = default) {
+            var tmpptr = (IntPtr) 0;
 
-        internal struct Flags {
-            public const int PROCESS_VM_OPERATION = 0x0008;
-            public const int PROCESS_VM_READ      = 0x0010;
-            public const int PROCESS_VM_WRITE     = 0x0020;
+            for ( var i = 0; i < offsets.Length; i++ )
+                if ( i == 0 ) {
+                    if ( debug )
+                        Console.Write( @base + "[Base] + " + offsets[i] + "[OFFSET 0]" );
+                    var ptr = IntPtr.Add( @base, (int) offsets[i] );
+                    tmpptr = (IntPtr) ReadInt64( ptr, ref miProcessHandle, 8, handle.Handle );
+                    if ( debug )
+                        Console.WriteLine( " is " + tmpptr );
+                }
+                else if ( i == offsets.Length - 1 ) {
+                    if ( debug )
+                        Console.Write( tmpptr + " + " + offsets[i] + "[LAST " + i + "]" );
+                    var ptr2 = IntPtr.Add( tmpptr, (int) offsets[i] );
+                    tmpptr = ptr2;
+                }
+                else {
+                    if ( debug )
+                        Console.Write( tmpptr + " + " + offsets[i] + "[OFFSET " + i + "]" );
+                    var ptr2 = IntPtr.Add( tmpptr, (int) offsets[i] );
+                    tmpptr = (IntPtr) ReadInt64( ptr2, ref miProcessHandle, 8, handle.Handle );
+                    if ( debug )
+                        Console.WriteLine( " is " + tmpptr );
+                }
+
+            return tmpptr;
         }
 
         #endregion
@@ -198,7 +188,7 @@ namespace Framework {
             return floats;
         }
 
-        private static T ByteArrayToStructure <T>(byte[] bytes) where T : struct {
+        public static T ByteArrayToStructure <T>(byte[] bytes) where T : struct {
             var handle = GCHandle.Alloc( bytes, GCHandleType.Pinned );
 
             try {
@@ -208,8 +198,8 @@ namespace Framework {
             }
         }
 
-        private static byte[] StructureToByteArray(object obj) {
-            var length = Marshal.SizeOf( obj );
+        public static byte[] StructureToByteArray(object obj) {
+            int length = Marshal.SizeOf( obj );
 
             var array = new byte[length];
 
@@ -221,6 +211,25 @@ namespace Framework {
 
             return array;
         }
+
+        #endregion
+
+        #region NativeMethodes
+
+        [DllImport( "kernel32.dll" )] public static extern IntPtr OpenProcess(ProcessFlags dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+
+        [DllImport( "ntdll" )] public static extern bool NtReadVirtualMemory(IntPtr  processHandle, IntPtr baseAddress, byte[] buffer, int numberOfBytesToRead,  out int numberOfBytesRead);
+        [DllImport( "ntdll" )] public static extern bool NtWriteVirtualMemory(IntPtr processHandle, IntPtr baseAddress, byte[] buffer, int numberOfBytesToWrite, out int numberOfBytesWritten);
+
+        #region Other
+
+        public enum ProcessFlags {
+            PROCESS_VM_OPERATION = 0x0008,
+            PROCESS_VM_READ      = 0x0010,
+            PROCESS_VM_WRITE     = 0x0020
+        }
+
+        #endregion
 
         #endregion
 
