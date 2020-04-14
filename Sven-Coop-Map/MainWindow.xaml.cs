@@ -66,6 +66,8 @@ namespace Sven_Coop_Map {
 
                 ReadFromGame( ref pos, ref color, t );
 
+                if(pos == Vec3.Zero) continue;
+
                 var point  = new Point3DPlus( new Point3D( pos.x, pos.y, pos.z ), color, 1.5 );
                 var invoke = false;
 
@@ -167,6 +169,8 @@ namespace Sven_Coop_Map {
                     break;
             }
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e) { new ConfigView().Show(); }
     }
 
 }

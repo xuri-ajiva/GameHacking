@@ -24,20 +24,6 @@ namespace Sven_Coop_Map {
             
             Position = new DirectUpdate<Vec3>(M, Offsets, "hw.dll" );
 
-            new Thread( () => {
-                const int sleep  = 1;
-                const int radius = 200;
-                Thread.Sleep( 2000 );
-                var    sp   = Position.Value;
-                double time = 0;
-
-                while ( true ) {
-                    var cp = sp.Add( new Vec3( Math.Sin( time * ( Math.E - 2.6 ) ) * radius, Math.Cos( time * ( Math.PI - 3 ) ) * radius, -Math.Sin( time * ( Math.E + Math.PI - 5.7 ) ) * radius ) );
-                    Position.Value = cp;
-                    Thread.Sleep( sleep );
-                    time += sleep / 100d;
-                }
-            } );//.Start();
 
             App app = new App();
             app.InitializeComponent();

@@ -8,8 +8,11 @@
         xmlns:componentmodel="clr-namespace:System.ComponentModel;assembly=System"
         xmlns:helixTraceDemoApp="clr-namespace:HelixTraceDemoApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="655.5" Width="750.5">
+        Title="MainWindow" Height="655.5" Width="750.5" Loaded="Window_Loaded">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
         <helixTraceDemoApp:HelixPlot x:Name="plot" ShowViewCube="False" />
         <Grid HorizontalAlignment="Right" Height="30" VerticalAlignment="Bottom" Width="30" Margin="0">
             <Grid.Background>
@@ -21,7 +24,7 @@
             <Grid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Clear" TabIndex="1" Click="MenuItem_OnClick" />
-                    <MenuItem Header="Save" TabIndex="2" Click="MenuItem_OnClick" />      
+                    <MenuItem Header="Save" TabIndex="2" Click="MenuItem_OnClick" />
                     <MenuItem Header="Load" TabIndex="3" Click="MenuItem_OnClick" />
                     <Separator />
                     <MenuItem Header="Recalculate Pointer" TabIndex="99" Click="MenuItem_OnClick" />
