@@ -1,0 +1,15 @@
+﻿<Window x:Class="Sven_Coop_Map.ConfigView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Sven_Coop_Map"
+        mc:Ignorable="d"
+        Title="ConfigView" Height="385.392" Width="348.497">
+    <Grid>
+        <CheckBox Content="Rotate" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" RenderTransformOrigin="0.941,1.224" Height="18" Width="75" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked"/>
+        <Button Content="ReadCenter" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,33,0,0" Height="21" Click="Button_Click"/>
+        <Slider HorizontalAlignment="Left" Height="18" Margin="112.883,10,0,0" VerticalAlignment="Top" Width="164.935" Background="Black" Maximum="1000" Minimum="10" Value="100" ValueChanged="Slider_ValueChanged"/>
+
+    </Grid>
+</Window>
