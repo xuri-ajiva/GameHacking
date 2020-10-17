@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using HackFramework;
 
-namespace Sven_Coop_Map {
+namespace Map {
     class Rotater {
         private static bool _rotate = false;
 

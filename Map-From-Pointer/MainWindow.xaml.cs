@@ -3,28 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 using HackFramework;
-using HelixToolkit.Wpf;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 
-namespace Sven_Coop_Map {
+namespace Map {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
     /// </summary>
@@ -113,7 +103,7 @@ namespace Sven_Coop_Map {
         }
 
         private void btnZoom_Click(object sender, RoutedEventArgs e) {
-            this.plot.ZoomExtents( 500 ); // zoom to extents
+            //this.plot.ZoomExtents( 500 ); // zoom to extents
             //plot.ResetCamera();  // orient and zoom
         }
 

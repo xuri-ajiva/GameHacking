@@ -17,15 +17,14 @@
 //IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 //WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
-using HelixToolkit.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using HelixToolkit.Wpf;
 
-namespace HelixTraceDemoApp
+namespace Map
 {
     /// <summary>
     /// Plot a trace in 3D space with marker, axes and bounding box.
@@ -70,22 +69,22 @@ namespace HelixTraceDemoApp
         public HelixPlot()
             : base()
         {
-            ZoomExtentsWhenLoaded = true;
-            ShowCoordinateSystem = false;
-            ShowViewCube = false;
-            ShowFrameRate = true;  // very useful diagnostic info
-            ShowTriangleCountInfo = true;  // very useful diagnostic info
+            this.ZoomExtentsWhenLoaded = true;
+            this.ShowCoordinateSystem  = false;
+            this.ShowViewCube          = false;
+            this.ShowFrameRate         = true; // very useful diagnostic info
+            this.ShowTriangleCountInfo = true; // very useful diagnostic info
 
             // Default configuration:
-            AxisLabels = "X,Y,Z";
-            BoundingBox = new Rect3D(0, 0, 0, 100, 100, 50);
-            TickSize = 10;
-            MinDistance = 0.1;
-            DecimalPlaces = 1;
-            Background = Brushes.White;
-            AxisBrush = Brushes.Gray;
-            MarkerBrush = Brushes.Red;
-            Elements = EElements.All;
+            this.AxisLabels    = "X,Y,Z";
+            this.BoundingBox   = new Rect3D(0, 0, 0, 100, 100, 50);
+            this.TickSize      = 10;
+            this.MinDistance   = 0.1;
+            this.DecimalPlaces = 1;
+            this.Background    = Brushes.White;
+            this.AxisBrush     = Brushes.Gray;
+            this.MarkerBrush   = Brushes.Red;
+            this.Elements      = EElements.All;
             CreateElements();
         }
 
@@ -133,133 +132,133 @@ namespace HelixTraceDemoApp
         public EElements Elements { get; set; }
 
         /// <summary>Gets the current trace color.</summary>
-        public Color TraceColor { get { return (path != null) ? path.Color : Colors.Black; } }
+        public Color TraceColor { get { return (this.path != null) ? this.path.Color : Colors.Black; } }
 
         /// <summary>Gets the current trace thickness.</summary>
-        public double TraceThickness { get { return (path != null) ? path.Thickness : 1; } }
+        public double TraceThickness { get { return (this.path != null) ? this.path.Thickness : 1; } }
 
         /// <summary>Creates the plot elements.</summary>
         /// <remarks>Changes to the bounding box and other parameters will not take effect until this method is called.</remarks>
         public void CreateElements()
         {
-            Children.Clear();
-            Children.Add(new DefaultLights());
+            this.Children.Clear();
+            this.Children.Add(new DefaultLights());
 
-            string[] labels = AxisLabels.Split(',');
+            string[] labels = this.AxisLabels.Split(',');
             if (labels.Length < 3)
                 labels = new string[] { "X", "Y", "Z" };
 
-            double bbSize = Math.Max(Math.Max(BoundingBox.SizeX, BoundingBox.SizeY), BoundingBox.SizeZ);
-            double lineThickness = bbSize / 1000;
-            double arrowOffset = lineThickness * 30;
-            labelOffset = lineThickness * 50;
-            minDistanceSquared = MinDistance * MinDistance;
+            double bbSize        = Math.Max(Math.Max(this.BoundingBox.SizeX, this.BoundingBox.SizeY), this.BoundingBox.SizeZ);
+            double lineThickness = bbSize        / 1000;
+            double arrowOffset   = lineThickness * 30;
+            this.labelOffset        = lineThickness    * 50;
+            this.minDistanceSquared = this.MinDistance * this.MinDistance;
 
-            if (Elements.HasFlag(EElements.Grid))
+            if (this.Elements.HasFlag(EElements.Grid))
             {
                 var grid = new GridLinesVisual3D();
-                grid.Center = new Point3D(BoundingBox.X + 0.5 * BoundingBox.SizeX, BoundingBox.Y + 0.5 * BoundingBox.SizeY, BoundingBox.Z);
-                grid.Length = BoundingBox.SizeX;
-                grid.Width = BoundingBox.SizeY;
-                grid.MinorDistance = TickSize;
+                grid.Center        = new Point3D(this.BoundingBox.X + 0.5 * this.BoundingBox.SizeX, this.BoundingBox.Y + 0.5 * this.BoundingBox.SizeY, this.BoundingBox.Z);
+                grid.Length        = this.BoundingBox.SizeX;
+                grid.Width         = this.BoundingBox.SizeY;
+                grid.MinorDistance = this.TickSize;
                 grid.MajorDistance = bbSize;
-                grid.Thickness = lineThickness;
-                grid.Fill = AxisBrush;
-                Children.Add(grid);
+                grid.Thickness     = lineThickness;
+                grid.Fill          = this.AxisBrush;
+                this.Children.Add(grid);
             }
 
-            if (Elements.HasFlag(EElements.Axes))
+            if (this.Elements.HasFlag(EElements.Axes))
             {
                 var arrow = new ArrowVisual3D();
-                arrow.Point2 = new Point3D((BoundingBox.X + BoundingBox.SizeX) + arrowOffset, 0.0, 0.0);
+                arrow.Point2   = new Point3D((this.BoundingBox.X + this.BoundingBox.SizeX) + arrowOffset, 0.0, 0.0);
                 arrow.Diameter = lineThickness * 5;
-                arrow.Fill = AxisBrush;
-                Children.Add(arrow);
+                arrow.Fill     = this.AxisBrush;
+                this.Children.Add(arrow);
 
                 var label = new BillboardTextVisual3D();
-                label.Text = labels[0];
+                label.Text       = labels[0];
                 label.FontWeight = FontWeights.Bold;
-                label.Foreground = AxisBrush;
-                label.Position = new Point3D((BoundingBox.X + BoundingBox.SizeX) + labelOffset, 0.0, 0.0);
-                Children.Add(label);
+                label.Foreground = this.AxisBrush;
+                label.Position   = new Point3D((this.BoundingBox.X + this.BoundingBox.SizeX) + this.labelOffset, 0.0, 0.0);
+                this.Children.Add(label);
 
-                arrow = new ArrowVisual3D();
-                arrow.Point2 = new Point3D(0.0, (BoundingBox.Y + BoundingBox.SizeY) + arrowOffset, 0.0);
+                arrow          = new ArrowVisual3D();
+                arrow.Point2   = new Point3D(0.0, (this.BoundingBox.Y + this.BoundingBox.SizeY) + arrowOffset, 0.0);
                 arrow.Diameter = lineThickness * 5;
-                arrow.Fill = AxisBrush;
-                Children.Add(arrow);
+                arrow.Fill     = this.AxisBrush;
+                this.Children.Add(arrow);
 
-                label = new BillboardTextVisual3D();
-                label.Text = labels[1];
+                label            = new BillboardTextVisual3D();
+                label.Text       = labels[1];
                 label.FontWeight = FontWeights.Bold;
-                label.Foreground = AxisBrush;
-                label.Position = new Point3D(0.0, (BoundingBox.Y + BoundingBox.SizeY) + labelOffset, 0.0);
-                Children.Add(label);
+                label.Foreground = this.AxisBrush;
+                label.Position   = new Point3D(0.0, (this.BoundingBox.Y + this.BoundingBox.SizeY) + this.labelOffset, 0.0);
+                this.Children.Add(label);
 
-                if (BoundingBox.SizeZ > 0)
+                if (this.BoundingBox.SizeZ > 0)
                 {
-                    arrow = new ArrowVisual3D();
-                    arrow.Point2 = new Point3D(0.0, 0.0, (BoundingBox.Z + BoundingBox.SizeZ) + arrowOffset);
+                    arrow          = new ArrowVisual3D();
+                    arrow.Point2   = new Point3D(0.0, 0.0, (this.BoundingBox.Z + this.BoundingBox.SizeZ) + arrowOffset);
                     arrow.Diameter = lineThickness * 5;
-                    arrow.Fill = AxisBrush;
-                    Children.Add(arrow);
+                    arrow.Fill     = this.AxisBrush;
+                    this.Children.Add(arrow);
 
-                    label = new BillboardTextVisual3D();
-                    label.Text = labels[2];
+                    label            = new BillboardTextVisual3D();
+                    label.Text       = labels[2];
                     label.FontWeight = FontWeights.Bold;
-                    label.Foreground = AxisBrush;
-                    label.Position = new Point3D(0.0, 0.0, (BoundingBox.Z + BoundingBox.SizeZ) + labelOffset);
-                    Children.Add(label);
+                    label.Foreground = this.AxisBrush;
+                    label.Position   = new Point3D(0.0, 0.0, (this.BoundingBox.Z + this.BoundingBox.SizeZ) + this.labelOffset);
+                    this.Children.Add(label);
                 }
             }
 
-            if (Elements.HasFlag(EElements.BoundingBox) && BoundingBox.SizeZ > 0)
+            if (this.Elements.HasFlag(EElements.BoundingBox) && this.BoundingBox.SizeZ > 0)
             {
                 var box = new BoundingBoxWireFrameVisual3D();
-                box.BoundingBox = BoundingBox;
-                box.Thickness = 1;
-                box.Color = AxisBrush.Color;
-                Children.Add(box);
+                box.BoundingBox = this.BoundingBox;
+                box.Thickness   = 1;
+                box.Color       = this.AxisBrush.Color;
+                this.Children.Add(box);
             }
 
-            if (Elements.HasFlag(EElements.Marker))
+            if (this.Elements.HasFlag(EElements.Marker))
             {
-                marker = new TruncatedConeVisual3D();
-                marker.Height = labelOffset;
-                marker.BaseRadius = 0.0;
-                marker.TopRadius = labelOffset / 5;
-                marker.TopCap = true;
-                marker.Origin = new Point3D(0.0, 0.0, 0.0);
-                marker.Normal = new Vector3D(-1.0, -1.0, 1.0);
-                marker.Fill = MarkerBrush;
-                Children.Add(marker);
+                this.marker            = new TruncatedConeVisual3D();
+                this.marker.Height     = this.labelOffset;
+                this.marker.BaseRadius = 0.0;
+                this.marker.TopRadius  = this.labelOffset / 5;
+                this.marker.TopCap     = true;
+                this.marker.Origin     = new Point3D(0.0, 0.0, 0.0);
+                this.marker.Normal     = new Vector3D(-1.0, -1.0, 1.0);
+                this.marker.Fill       = this.MarkerBrush;
+                this.Children.Add(this.marker);
 
-                coords = new BillboardTextVisual3D();
-                coordinateFormat = string.Format("{{0:F{0}}}, {{1:F{0}}}, {{2:F{0}}}", DecimalPlaces, DecimalPlaces, DecimalPlaces);  // "{0:F2}, {1:F2}, {2:F2}"
-                coords.Text = string.Format(coordinateFormat, 0.0, 0.0, 0.0);
-                coords.Foreground = MarkerBrush;
-                coords.Position = new Point3D(-labelOffset, -labelOffset, labelOffset);
-                Children.Add(coords);
+                this.coords            = new BillboardTextVisual3D();
+                this.coordinateFormat  = string.Format("{{0:F{0}}}, {{1:F{0}}}, {{2:F{0}}}", this.DecimalPlaces, this.DecimalPlaces, this.DecimalPlaces); // "{0:F2}, {1:F2}, {2:F2}"
+                this.coords.Text       = string.Format(this.coordinateFormat, 0.0, 0.0, 0.0);
+                this.coords.Foreground = this.MarkerBrush;
+                this.coords.Position   = new Point3D(-this.labelOffset, -this.labelOffset, this.labelOffset);
+                this.Children.Add(this.coords);
             }
             else
             {
-                marker = null;
-                coords = null;
+                this.marker = null;
+                this.coords = null;
             }
 
-            if (trace != null)
+            if (this.trace != null)
             {
-                foreach (LinesVisual3D p in trace)
-                    Children.Add(p);
-                path = trace[trace.Count - 1];
+                foreach (LinesVisual3D p in this.trace)
+                    this.Children.Add(p);
+                this.path = this.trace[this.trace.Count - 1];
             }
         }
 
         /// <summary>Clears all traces.</summary>
         public void Clear()
         {
-            trace = null;
-            path = null;
+            this.trace = null;
+            this.path  = null;
             CreateElements();
         }
 
@@ -274,20 +273,20 @@ namespace HelixTraceDemoApp
         /// <seealso cref="Clear"/>
         public void NewTrace(Point3D point, Color color, double thickness = 1)
         {
-            path = new LinesVisual3D();
-            path.Color = color;
-            path.Thickness = thickness;
-            trace = new List<LinesVisual3D>();
-            trace.Add(path);
-            Children.Add(path);
-            point0 = point;
-            delta0 = new Vector3D();
+            this.path           = new LinesVisual3D();
+            this.path.Color     = color;
+            this.path.Thickness = thickness;
+            this.trace          = new List<LinesVisual3D>();
+            this.trace.Add(this.path);
+            this.Children.Add(this.path);
+            this.point0 = point;
+            this.delta0 = new Vector3D();
 
-            if (marker != null)
+            if (this.marker != null)
             {
-                marker.Origin = point;
-                coords.Position = new Point3D(point.X - labelOffset, point.Y - labelOffset, point.Z + labelOffset);
-                coords.Text = string.Format(coordinateFormat, point.X, point.Y, point.Z);
+                this.marker.Origin   = point;
+                this.coords.Position = new Point3D(point.X - this.labelOffset, point.Y - this.labelOffset, point.Z + this.labelOffset);
+                this.coords.Text     = string.Format(this.coordinateFormat, point.X, point.Y, point.Z);
             }
         }
 
@@ -316,56 +315,56 @@ namespace HelixTraceDemoApp
         /// <seealso cref="AddPoint(double, double, double, Color, double)"/>
         public void AddPoint(Point3D point, Color color, double thickness = -1)
         {
-            if (trace == null)
+            if (this.trace == null)
             {
                 NewTrace(point, color, (thickness > 0) ? thickness : 1);
                 return;
             }
 
-            if ((point - point0).LengthSquared < minDistanceSquared) return;  // less than min distance from last point
+            if ((point - this.point0).LengthSquared < this.minDistanceSquared) return; // less than min distance from last point
 
-            if (path.Color != color || (thickness > 0 && path.Thickness != thickness))
+            if (this.path.Color != color || (thickness > 0 && this.path.Thickness != thickness))
             {
                 if (thickness <= 0)
-                    thickness = path.Thickness;
+                    thickness = this.path.Thickness;
 
-                path = new LinesVisual3D();
-                path.Color = color;
-                path.Thickness = thickness;
-                trace.Add(path);
-                Children.Add(path);
+                this.path           = new LinesVisual3D();
+                this.path.Color     = color;
+                this.path.Thickness = thickness;
+                this.trace.Add(this.path);
+                this.Children.Add(this.path);
             }
 
             // If line segments AB and BC have the same direction (small cross product) then remove point B.
             bool sameDir = false;
-            var delta = new Vector3D(point.X - point0.X, point.Y - point0.Y, point.Z - point0.Z);
+            var  delta   = new Vector3D(point.X - this.point0.X, point.Y - this.point0.Y, point.Z - this.point0.Z);
             delta.Normalize();  // use unit vectors (magnitude 1) for the cross product calculations
-            if (path.Points.Count > 0)
+            if (this.path.Points.Count > 0)
             {
-                double xp2 = Vector3D.CrossProduct(delta, delta0).LengthSquared;
+                double xp2 = Vector3D.CrossProduct(delta, this.delta0).LengthSquared;
                 sameDir = (xp2 < 0.0005);  // approx 0.001 seems to be a reasonable threshold from logging xp2 values
                 //if (!sameDir) Title = string.Format("xp2={0:F6}", xp2);
             }
 
             if (sameDir)  // extend the current line segment
             {
-                path.Points[path.Points.Count - 1] = point;
-                point0 = point;
-                delta0 += delta;
+                this.path.Points[this.path.Points.Count - 1] =  point;
+                this.point0                                  =  point;
+                this.delta0                                  += delta;
             }
             else  // add a new line segment
             {
-                path.Points.Add(point0);
-                path.Points.Add(point);
-                point0 = point;
-                delta0 = delta;
+                this.path.Points.Add(this.point0);
+                this.path.Points.Add(point);
+                this.point0 = point;
+                this.delta0 = delta;
             }
 
-            if (marker != null)
+            if (this.marker != null)
             {
-                marker.Origin = point;
-                coords.Position = new Point3D(point.X - labelOffset, point.Y - labelOffset, point.Z + labelOffset);
-                coords.Text = string.Format(coordinateFormat, point.X, point.Y, point.Z);
+                this.marker.Origin   = point;
+                this.coords.Position = new Point3D(point.X - this.labelOffset, point.Y - this.labelOffset, point.Z + this.labelOffset);
+                this.coords.Text     = string.Format(this.coordinateFormat, point.X, point.Y, point.Z);
             }
         }
 
@@ -376,13 +375,13 @@ namespace HelixTraceDemoApp
         /// <seealso cref="AddPoint(Point3D, Color, double)"/>
         public void AddPoint(Point3D point)
         {
-            if (path == null)
+            if (this.path == null)
             {
                 NewTrace(point, Colors.Black, 1);
                 return;
             }
 
-            AddPoint(point, path.Color, path.Thickness);
+            AddPoint(point, this.path.Color, this.path.Thickness);
         }
 
         /// <summary>
@@ -408,9 +407,9 @@ namespace HelixTraceDemoApp
         /// <seealso cref="AddPoint(double, double, double, Color, double)"/>
         public void AddPoint(double x, double y, double z)
         {
-            if (path == null) return;
+            if (this.path == null) return;
 
-            AddPoint(new Point3D(x, y, z), path.Color, path.Thickness);
+            AddPoint(new Point3D(x, y, z), this.path.Color, this.path.Thickness);
         }
     }
 }

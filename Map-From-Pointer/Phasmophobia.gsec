@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<GameSetup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <X64>true</X64>
+  <Offsets>
+    <string>0x01803F78</string>
+    <string>0x8</string>
+    <string>0x18</string>
+    <string>0x90</string>
+  </Offsets>
+  <Process>Phasmophobia</Process>
+  <BaseModule>UnityPlayer.dll</BaseModule>
+</GameSetup>

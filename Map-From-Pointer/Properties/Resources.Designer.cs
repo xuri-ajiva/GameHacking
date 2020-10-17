@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Sven_Coop_Map.Properties
+namespace Map.Properties
 {
 
 
