@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -13,7 +14,7 @@ namespace HackFramework
         #region Overrides of ValueType
 
         /// <inheritdoc />
-        public override string ToString() => $"{{{this.X},{this.Y},{this.Z}}}";
+        public override string ToString() => $"{{{this.X.ToString(CultureInfo.InvariantCulture)},{this.Y.ToString(CultureInfo.InvariantCulture)},{this.Z.ToString(CultureInfo.InvariantCulture)}}}";
 
         #endregion
 
