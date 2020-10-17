@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PointerLevelData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <X64>false</X64>
+  <Offsets>
+    <string>0x570EE00</string>
+    <string>0x88</string>
+  </Offsets>
+  <Process>svencoop</Process>
+  <BaseModule>hw.dll</BaseModule>
+  <Scale>10</Scale>
+</PointerLevelData>
